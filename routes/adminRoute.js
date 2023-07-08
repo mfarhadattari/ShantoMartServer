@@ -39,4 +39,18 @@ router.patch("/update-product/:id", async (req, res) => {
   res.send(result);
 });
 
+// ! ---------------- Get all Customers ------- //
+router.get("/customers", async (req, res) => {
+  const customerCollection = req.customerCollection;
+  const customers = await customerCollection.find().toArray();
+  res.send(customers.reverse());
+});
+
+// ! ---------------- Get all Orders ------- //
+router.get("/orders", async (req, res) => {
+  const orderCollection = req.orderCollection;
+  const customers = await orderCollection.find().toArray();
+  res.send(customers.reverse());
+});
+
 module.exports = router;
