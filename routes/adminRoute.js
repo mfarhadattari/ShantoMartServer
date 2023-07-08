@@ -53,4 +53,25 @@ router.get("/orders", async (req, res) => {
   res.send(customers.reverse());
 });
 
+// ! ---------------- Order Details ---- /
+router.get("/orders/:id", async (req, res) => {
+  const orderCollection = req.orderCollection;
+  const id = req.params.id;
+  const order = await orderCollection.findOne({ _id: new ObjectId(id) });
+  res.send(order);
+});
+
+// ! ----------- Update status of order---------------
+router.patch("/update-status/:id", async (req, res) => {
+  const orderCollection = req.orderCollection;
+  const query = { _id: new ObjectId(req.params.id) };
+  const updateDoc = {
+    $set: {
+      status: req.body.status,
+    },
+  };
+  const result = await orderCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
 module.exports = router;
