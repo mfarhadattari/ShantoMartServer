@@ -1,11 +1,17 @@
-# ShantoMart
-### An E-commerce Site
-### Client URL: https://shanto-mart.vercel.app/
-### Server URL: https://shanto-mart-server.vercel.app/
-### Client Repo: https://github.com/mfarhadattari/ShantoMart.git
+# ------------------ ShantoMart ----------------
+### An E-commerce Site with user login & registering, admin management and cart & order management system.
 
+# Fetured
+* Admin Data Management System
+* Backend Authentication System
+* Cart & Order Management System
 
-## Frontend Used
+# URL
+* Client URL: https://shanto-mart.vercel.app/
+* Server URL: https://shanto-mart-server.vercel.app/
+* Server Repo: https://github.com/mfarhadattari/ShantoMart.git
+  
+# Frontend Used
 * React Vite
 * React Router DOM
 * Tailwind CSS
@@ -22,7 +28,7 @@
 * Axios
 
 
-## Backend used
+# Backend used
 * Node JS
 * Express JS
 * MongoDB
