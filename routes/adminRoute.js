@@ -17,7 +17,7 @@ router.delete("/delete-product/:id", async (req, res) => {
   res.send(result);
 });
 
-// ! ------------------ Add to Product ---------------
+// ! ------------------ Add A Product ---------------
 router.post("/add-product", async (req, res) => {
   const productCollection = req.productCollection;
   const data = req.body;
@@ -73,6 +73,20 @@ router.get("/customers/:id", async (req, res) => {
     cart,
     ordersInfo,
   });
+});
+
+// ! ------------------ Add A Customer ---------------
+router.post("/add-customer", async (req, res) => {
+  const customerCollection = req.customerCollection;
+  const data = req.body;
+  const alreadyExist = await customerCollection.findOne({
+    phoneNumber: data.phoneNumber,
+  });
+  if (alreadyExist) {
+    return res.send({ alreadyExist: true });
+  }
+  const result = await customerCollection.insertOne(data);
+  res.send(result);
 });
 
 // ! ---------------- Get all Orders ------- //
