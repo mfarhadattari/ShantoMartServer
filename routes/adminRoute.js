@@ -2,6 +2,21 @@ const express = require("express");
 const { ObjectId } = require("mongodb");
 const router = express.Router();
 
+// ! ---------------- Admin Overviews -------------
+router.get("/overviews", async (req, res) => {
+  const productCollection = req.productCollection;
+  const orderCollection = req.orderCollection;
+  const customerCollection = req.customerCollection;
+  const cartCollection = req.cartCollection;
+
+  const totalProduct = await productCollection.estimatedDocumentCount();
+  const totalOrder = await orderCollection.estimatedDocumentCount();
+  const totalCart = await cartCollection.estimatedDocumentCount();
+  const totalCustomer = await customerCollection.estimatedDocumentCount();
+
+  res.send({ totalProduct, totalCustomer, totalCart, totalOrder });
+});
+
 // ! ------------------ Products ---------------
 router.get("/products", async (req, res) => {
   const productCollection = req.productCollection;
