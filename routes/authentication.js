@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-const { verifyToken } = require("../utils/middleware");
+const {authVerifyToken } = require("../utils/middleware");
 require("dotenv").config();
 
 const router = express.Router();
@@ -44,17 +44,17 @@ router.post("/login", async (req, res) => {
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
-  res.send({ token });
+  res.send({ token, user });
 });
 
 // ! --------------------Get user ---------------
-router.get("/user", verifyToken, async (req, res) => {
+router.get("/user", authVerifyToken, async (req, res) => {
   const userCollection = req.userCollection;
   const user = await userCollection.findOne({ _id: new ObjectId(req.userId) });
   if (!user) {
-    return res.status(404).send({ error: "User not found" });
+    return res.send({ error: true, message: "User not found" });
   }
-  res.send(user);
+  res.send({user: user});
 });
 
 module.exports = router;
