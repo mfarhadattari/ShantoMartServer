@@ -1,6 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const { verifyToken } = require("../utils/middleware");
 require("dotenv").config();
 
 const router = express.Router();
@@ -23,6 +25,7 @@ router.post("/create-account", async (req, res) => {
   res.send(result);
 });
 
+// ! --------------------Login user --------------
 router.post("/login", async (req, res) => {
   const userCollection = req.userCollection;
   const { phoneNumber, password } = req.body;
@@ -42,6 +45,16 @@ router.post("/login", async (req, res) => {
     expiresIn: "1h",
   });
   res.send({ token });
+});
+
+// ! --------------------Get user ---------------
+router.get("/user", verifyToken, async (req, res) => {
+  const userCollection = req.userCollection;
+  const user = await userCollection.findOne({ _id: new ObjectId(req.userId) });
+  if (!user) {
+    return res.status(404).send({ error: "User not found" });
+  }
+  res.send(user);
 });
 
 module.exports = router;
