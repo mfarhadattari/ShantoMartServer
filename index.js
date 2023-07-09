@@ -14,6 +14,7 @@ app.use(express.json());
 const publicRoute = require("./routes/publicRoute");
 const adminRoute = require("./routes/adminRoute");
 const userRoute = require("./routes/userRoute");
+const authRoute = require("./routes/authentication");
 
 const client = new MongoClient(process.env.MONGODB_URI, {
   serverApi: {
@@ -41,6 +42,7 @@ async function run() {
     // ! Router Middleware
     app.use("/", publicRoute);
     app.use("/", userRoute);
+    app.use("/", authRoute);
     app.use("/admin", adminRoute);
 
     await client.db("admin").command({ ping: 1 });
