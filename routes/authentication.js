@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-const {authVerifyToken } = require("../utils/middleware");
+const { authVerifyToken } = require("../utils/middleware");
 require("dotenv").config();
 
 const router = express.Router();
@@ -10,6 +10,7 @@ const router = express.Router();
 // ! --------------------Create user --------------
 router.post("/create-account", async (req, res) => {
   const userCollection = req.userCollection;
+  const customerCollection = req.customerCollection;
   const { displayName, phoneNumber, photoURL, password } = req.body;
   const alreadyExist = await userCollection.findOne({ phoneNumber });
   if (alreadyExist) {
@@ -21,6 +22,11 @@ router.post("/create-account", async (req, res) => {
     phoneNumber,
     photoURL,
     password: hashedPassword,
+  });
+  const addCustomer = await customerCollection.insertOne({
+    displayName,
+    phoneNumber,
+    photoURL,
   });
   res.send(result);
 });
@@ -54,7 +60,7 @@ router.get("/user", authVerifyToken, async (req, res) => {
   if (!user) {
     return res.send({ error: true, message: "User not found" });
   }
-  res.send({user: user});
+  res.send({ user: user });
 });
 
 module.exports = router;
