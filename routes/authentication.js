@@ -4,7 +4,6 @@ const { ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 const { authVerifyToken } = require("../utils/middleware");
 require("dotenv").config();
-
 const router = express.Router();
 
 // ! --------------------Create user --------------
@@ -23,11 +22,14 @@ router.post("/create-account", async (req, res) => {
     photoURL,
     password: hashedPassword,
   });
-  const addCustomer = await customerCollection.insertOne({
-    displayName,
-    phoneNumber,
-    photoURL,
-  });
+  const customerExist = await customerCollection.findOne({ phoneNumber });
+  if (!customerExist) {
+    const addCustomer = await customerCollection.insertOne({
+      name: displayName,
+      phoneNumber,
+      photoURL,
+    });
+  }
   res.send(result);
 });
 
@@ -37,15 +39,17 @@ router.post("/login", async (req, res) => {
   const { phoneNumber, password } = req.body;
   const user = await userCollection.findOne({ phoneNumber });
   if (!user) {
-    return res
-      .status(401)
-      .send({ error: true, message: "Invalid phone number or password" });
+    return res.send({
+      error: true,
+      message: "Invalid phone number or password",
+    });
   }
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
-    return res
-      .status(401)
-      .send({ error: true, message: "Invalid phone number or password" });
+    return res.send({
+      error: true,
+      message: "Invalid phone number or password",
+    });
   }
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
@@ -61,6 +65,25 @@ router.get("/user", authVerifyToken, async (req, res) => {
     return res.send({ error: true, message: "User not found" });
   }
   res.send({ user: user });
+});
+
+// !---------------------- Verify User ---------------
+router.post("/verify-user", authVerifyToken, async (req, res) => {
+  const userCollection = req.userCollection;
+  const userId = req.userId;
+  const { password, phoneNumber } = req.body;
+  const user = await userCollection.findOne({
+    _id: new ObjectId(userId),
+    phoneNumber,
+  });
+  if (!user) {
+    return res.send({ verified: false, message: "Invalid phone number!" });
+  }
+  const passwordMatch = await bcrypt.compare(password, user.password);
+  if (!passwordMatch) {
+    return res.send({ verified: false, message: "Invalid password!" });
+  }
+  res.send({ verified: true, message: "Successfully Verified!" });
 });
 
 module.exports = router;
