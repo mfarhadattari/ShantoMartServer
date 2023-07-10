@@ -109,5 +109,18 @@ router.delete("/delete-user", authVerifyToken, async (req, res) => {
   res.send(deleteResult);
 });
 
+// !--------------------- Change Password --------------
+router.patch("/change-password", authVerifyToken, async (req, res) => {
+  const userCollection = req.userCollection;
+  const userId = req.userId;
+  const { phoneNumber, newPassword } = req.body;
+  const query = { _id: new ObjectId(userId), phoneNumber };
+  const updatePassword = {
+    $set: { password: await bcrypt.hash(newPassword, 10) },
+  };
+  const changePassword = await userCollection.updateOne(query, updatePassword);
+  res.send(changePassword);
+});
+
 
 module.exports = router;
