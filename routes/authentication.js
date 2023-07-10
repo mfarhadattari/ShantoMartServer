@@ -100,5 +100,14 @@ router.patch("/update-profile", authVerifyToken, async (req, res) => {
   res.send(updateResult);
 });
 
+// !--------------------- Delete User ----------------
+router.delete("/delete-user", authVerifyToken, async (req, res) => {
+  const userCollection = req.userCollection;
+  const deleteResult = await userCollection.deleteOne({
+    _id: new ObjectId(req.userId),
+  });
+  res.send(deleteResult);
+});
+
 
 module.exports = router;
