@@ -86,4 +86,19 @@ router.post("/verify-user", authVerifyToken, async (req, res) => {
   res.send({ verified: true, message: "Successfully Verified!" });
 });
 
+// !--------------------- Update Profile ----------------
+router.patch("/update-profile", authVerifyToken, async (req, res) => {
+  const userCollection = req.userCollection;
+  const query = { _id: new ObjectId(req.userId) };
+  const data = req.body;
+  const updateDoc = {
+    $set: {
+      ...data,
+    },
+  };
+  const updateResult = await userCollection.updateOne(query, updateDoc);
+  res.send(updateResult);
+});
+
+
 module.exports = router;
