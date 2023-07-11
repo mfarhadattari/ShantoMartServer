@@ -41,20 +41,28 @@ router.post("/login", async (req, res) => {
   if (!user) {
     return res.send({
       error: true,
-      message: "Invalid phone number or password",
+      message: "Invalid phone number!",
     });
   }
   const passwordMatch = await bcrypt.compare(password, user.password);
   if (!passwordMatch) {
     return res.send({
       error: true,
-      message: "Invalid phone number or password",
+      message: "Wrong password!",
     });
   }
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+    expiresIn: "1d",
   });
-  res.send({ token, user });
+  const userInfo = {
+    _id: user._id,
+    displayName: user.displayName,
+    phoneNumber: user.phoneNumber,
+    photoURL: user.photoURL,
+    city: user?.city,
+    location: user?.location,
+  };
+  res.send({ token, user: userInfo });
 });
 
 // ! --------------------Get user ---------------
@@ -64,7 +72,15 @@ router.get("/user", authVerifyToken, async (req, res) => {
   if (!user) {
     return res.send({ error: true, message: "User not found" });
   }
-  res.send({ user: user });
+  const userInfo = {
+    _id: user._id,
+    displayName: user.displayName,
+    phoneNumber: user.phoneNumber,
+    photoURL: user.photoURL,
+    city: user?.city,
+    location: user?.location,
+  };
+  res.send({ user: userInfo });
 });
 
 // !---------------------- Verify User ---------------
@@ -122,5 +138,24 @@ router.patch("/change-password", authVerifyToken, async (req, res) => {
   res.send(changePassword);
 });
 
+// !------------------------ Change Phone Number ---------
+router.patch("/change-phone-number", async (req, res) => {
+  const userCollection = req.userCollection;
+  const userId = req.userId;
+  const { phoneNumber } = req.body;
+  const phoneNumberUsed = await userCollection.findOne({ phoneNumber });
+  if (phoneNumberUsed) {
+    return res.send({ error: true, message: "Phone number is already used!" });
+  }
+  const updatePhone = await userCollection.updateOne(
+    { _id: new ObjectId(userId) },
+    {
+      $set: {
+        phoneNumber,
+      },
+    }
+  );
+  res.send(updatePhone);
+});
 
 module.exports = router;
